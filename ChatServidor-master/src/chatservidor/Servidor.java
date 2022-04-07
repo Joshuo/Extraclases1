@@ -1,5 +1,7 @@
 package chatservidor;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedList;
@@ -33,18 +35,24 @@ public class Servidor extends Thread{
      * conectaran, por ejemplo, dos usuarios con el mismo nombre, se podrían diferenciar
      * por este correlativo.
      */
+    private PrintWriter writer;
+    /**
+     * Varable que almacena las exepciones en un archivo txt.
+     */
     static int correlativo;
     /**
      * Constructor del servidor.
      * @param puerto
      * @param ventana 
      */
-    public Servidor(String puerto, VentanaS ventana) {
+    public Servidor(String puerto, VentanaS ventana) throws FileNotFoundException {
         correlativo=0;
         this.puerto=puerto;
         this.ventana=ventana;
         clientes=new LinkedList<>();
+        writer = new PrintWriter("error.txt");
         this.start();
+        writer.close();
     }
     /**
      * Método sobre el que corre el bucle infinito que tiene como función escuchar
@@ -63,6 +71,7 @@ public class Servidor extends Thread{
                 h.start();
             }
         } catch (Exception e) {
+            writer.write(e.toString());
             JOptionPane.showMessageDialog(ventana, "El servidor no se ha podido iniciar,\n"
                                                  + "puede que haya ingresado un puerto incorrecto.\n"
                                                  + "Esta aplicación se cerrará.");

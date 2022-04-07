@@ -1,8 +1,10 @@
 package chatservidor;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.LinkedList;
 
@@ -36,19 +38,25 @@ public class HiloCliente extends Thread{
      * Variable booleana que almacena verdadero cuando este hilo esta escuchando
      * lo que el cliente que atiende esta diciendo.
      */
+    private PrintWriter writer;
+    /**
+     * Varable que almacena las exepciones en un archivo txt.
+     */
     private boolean escuchando;
    /**
     * Método constructor de la clase hilo cliente.
     * @param socket
     * @param server 
     */
-    public HiloCliente(Socket socket,Servidor server) {
+    public HiloCliente(Socket socket,Servidor server) throws FileNotFoundException {
         this.server=server;
         this.socket = socket;
+        writer = new PrintWriter("error.txt");
         try {
             objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
             objectInputStream = new ObjectInputStream(socket.getInputStream());
         } catch (IOException ex) {
+            writer.write(ex.toString());
             System.err.println("Error en la inicialización del ObjectOutputStream y el ObjectInputStream");
         }
     }
@@ -60,6 +68,7 @@ public class HiloCliente extends Thread{
             socket.close();
             escuchando=false;
         } catch (IOException ex) {
+            writer.write(ex.toString());
             System.err.println("Error al cerrar el socket de comunicación con el cliente.");
         }
     }
@@ -70,6 +79,7 @@ public class HiloCliente extends Thread{
         try{
             escuchar();
         } catch (Exception ex) {
+            writer.write(ex.toString());
             System.err.println("Error al llamar al método readLine del hilo del cliente.");
         }
         desconnectar();
@@ -87,7 +97,8 @@ public class HiloCliente extends Thread{
                 if(aux instanceof LinkedList){
                     ejecutar((LinkedList<String>)aux);
                 }
-            } catch (Exception e) {                    
+            } catch (Exception e) {
+                writer.write(e.toString());
                 System.err.println("Error al leer lo enviado por el cliente.");
             }
         }
@@ -131,6 +142,7 @@ public class HiloCliente extends Thread{
         try {
             objectOutputStream.writeObject(lista);            
         } catch (Exception e) {
+            writer.write(e.toString());
             System.err.println("Error al enviar el objeto al cliente.");
         }
     }    

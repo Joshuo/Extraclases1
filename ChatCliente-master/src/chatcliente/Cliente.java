@@ -43,6 +43,10 @@ public class Cliente extends Thread {
      * Varable que almacena el puerto por el cual el servidor escucha las conexiones
      * de los diversos clientes.
      */
+    private PrintWriter writer;
+    /**
+     * Varable que almacena las exepciones en un archivo txt.
+     */
     private final int puerto;
     /**
      * Constructor de la clase cliente.
@@ -51,13 +55,15 @@ public class Cliente extends Thread {
      * @param puerto
      * @param nombre 
      */
-    Cliente(VentanaC ventana, String host, Integer puerto, String nombre) {
+    Cliente(VentanaC ventana, String host, Integer puerto, String nombre) throws FileNotFoundException {
         this.ventana=ventana;        
         this.host=host;
         this.puerto=puerto;
         this.identificador=nombre;
         escuchando=true;
+        writer = new PrintWriter("error.txt");
         this.start();
+        writer.close();
     }
     /**
      * Método run del hilo de comunicación del lado del cliente.
@@ -71,12 +77,14 @@ public class Cliente extends Thread {
             this.enviarSolicitudConexion(identificador);
             this.escuchar();
         } catch (UnknownHostException ex) {
+            writer.write(ex.toString());
             JOptionPane.showMessageDialog(ventana, "Conexión rehusada, servidor desconocido,\n"
                                                  + "puede que haya ingresado una ip incorrecta\n"
                                                  + "o que el servidor no este corriendo.\n"
                                                  + "Esta aplicación se cerrará.");
             System.exit(0);
         } catch (IOException ex) {
+            writer.write(ex.toString());
             JOptionPane.showMessageDialog(ventana, "Conexión rehusada, error de Entrada/Salida,\n"
                                                  + "puede que haya ingresado una ip o un puerto\n"
                                                  + "incorrecto, o que el servidor no este corriendo.\n"
@@ -96,6 +104,7 @@ public class Cliente extends Thread {
             socket.close();  
             escuchando=false;
         } catch (Exception e) {
+            writer.write(e.toString());
             System.err.println("Error al cerrar los elementos de comunicación del cliente.");
         }
     }
@@ -117,6 +126,7 @@ public class Cliente extends Thread {
         try {
             objectOutputStream.writeObject(lista);
         } catch (IOException ex) {
+            writer.write(ex.toString());
             System.out.println("Error de lectura y escritura al enviar mensaje al servidor.");
         }
     }
@@ -140,6 +150,7 @@ public class Cliente extends Thread {
                 }
             }
         } catch (Exception e) {
+            writer.write(e.toString());
             JOptionPane.showMessageDialog(ventana, "La comunicación con el servidor se ha\n"
                                                  + "perdido, este chat tendrá que finalizar.\n"
                                                  + "Esta aplicación se cerrará.");
@@ -195,6 +206,7 @@ public class Cliente extends Thread {
         try {
             objectOutputStream.writeObject(lista);
         } catch (IOException ex) {
+            writer.write(ex.toString());
             System.out.println("Error de lectura y escritura al enviar mensaje al servidor.");
         }
     }
@@ -212,6 +224,7 @@ public class Cliente extends Thread {
         try {
             objectOutputStream.writeObject(lista);
         } catch (IOException ex) {
+            writer.write(ex.toString());
             System.out.println("Error de lectura y escritura al enviar mensaje al servidor.");
         }
     }
