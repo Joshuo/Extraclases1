@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package ejemplos;
-
+//parte del ejemplo esta en ejemplo.java
 /**
  *
  * @author Noel
